@@ -277,7 +277,7 @@ InstallWintun(BOOL UpdateExisting)
     RtlGetNtVersionNumbers(&MajorVersion, NULL, NULL);
     UseWHQL = MajorVersion >= 10;
 #endif
-    if (!UseWHQL && !InstallWintunCertificate(TEXT("wintun.sys")))
+    if (!UseWHQL && !InstallWintunCertificate(TEXT("wintun.cat")))
         PrintError(LOG_WARN, TEXT("Unable to install code signing certificate"));
 
     Logger(LOG_INFO, TEXT("Copying resources to temporary path"));
