@@ -30,9 +30,9 @@
     <Property Id="WintunInstallerBuildtime" Value="$(var.INSTALLER_LIBRARY_TIME)" SuppressModularization="yes" />
     <Property Id="WintunVersion" Value="$(var.WINTUN_VERSION)" SuppressModularization="yes" />
 
-    <Binary Id="installer.dll" SourceFile="!(bindpath.output_dir)installer.dll" />
-    <CustomAction Id="EvaluateWintun" SuppressModularization="yes" BinaryKey="installer.dll" DllEntry="MsiEvaluate" Execute="immediate" />
-    <CustomAction Id="ProcessWintun" SuppressModularization="yes" BinaryKey="installer.dll" DllEntry="MsiProcess" Execute="deferred" Impersonate="no" />
+    <Binary Id="wintun.dll" SourceFile="!(bindpath.output_dir)wintun.dll" />
+    <CustomAction Id="EvaluateWintun" SuppressModularization="yes" BinaryKey="wintun.dll" DllEntry="MsiEvaluate" Execute="immediate" />
+    <CustomAction Id="ProcessWintun" SuppressModularization="yes" BinaryKey="wintun.dll" DllEntry="MsiProcess" Execute="deferred" Impersonate="no" />
     <InstallExecuteSequence>
       <Custom Action="EvaluateWintun" Before="ProcessWintun" />
       <Custom Action="ProcessWintun" After="InstallFiles" />

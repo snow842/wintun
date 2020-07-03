@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="MSM">
-      <UniqueIdentifier>{1ae72c39-669d-49e5-85c7-f6956595e079}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="msi.c">
@@ -41,9 +38,6 @@
   <ItemGroup>
     <None Include="exports.def">
       <Filter>Source Files</Filter>
-    </None>
-    <None Include="installer.wxs">
-      <Filter>MSM</Filter>
     </None>
   </ItemGroup>
 </Project>

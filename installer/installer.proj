@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.WindowsSDK.props" />
+  <ImportGroup>
+    <Import Project="..\wintun.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <InstallerVersionMin>200</InstallerVersionMin>
+    <InstallerVersionMin Condition="'$(Platform)'=='ARM64'">500</InstallerVersionMin>
+    <OutDir>..\$(WintunPlatform)\$(Configuration)\</OutDir>
+    <IntDir>..\$(WintunPlatform)\$(Configuration)\installer-intermediate\</IntDir>
+    <WixArch Condition="'$(Platform)'=='Win32'">x86</WixArch>
+    <WixArch Condition="'$(Platform)'=='x64'">x64</WixArch>
+    <WixArch Condition="'$(Platform)'=='ARM64'">arm64</WixArch>
+    <WixCandleFlags>$(WixCandleFlags) -nologo -arch $(WixArch) -dWINTUN_PLATFORM=$(WintunPlatform) -dWINTUN_VERSION=$(WintunVersion) -dINSTALLER_VERSION_MIN=$(InstallerVersionMin) -sw1086</WixCandleFlags>
+    <WixLightFlags>$(WixLightFlags) -nologo -b output_dir="$(OutDir.TrimEnd('\'))" -spdb -sw1076 -sw1079</WixLightFlags>
+    <WixOutputPath>$(OutDir)</WixOutputPath>
+    <WixOutputName>wintun</WixOutputName>
+    <WixOutputExt>.msm</WixOutputExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <WixOutputPath>..\$(DistributionDir)</WixOutputPath>
+    <WixOutputName>wintun-$(WintunPlatform)-$(WintunVersionStr)</WixOutputName>
+  </PropertyGroup>
+  <Import Project="..\wintun.vcxproj.user" Condition="exists('..\wintun.vcxproj.user')" />
+  <Target Name="HashInstallerLibrary">
+    <GetFileHash Files="$(OutDir)wintun.dll" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="InstallerLibraryHash" />
+    </GetFileHash>
+    <PropertyGroup>
+      <WixCandleFlags>$(WixCandleFlags) -dINSTALLER_LIBRARY_HASH=@(InstallerLibraryHash-&gt;Metadata('FileHash')) -dINSTALLER_LIBRARY_TIME=$([System.IO.File]::GetLastWriteTime('$(OutDir)wintun.dll').Ticks)</WixCandleFlags>
+    </PropertyGroup>
+  </Target>
+  <Target Name="WixCompile" DependsOnTargets="HashInstallerLibrary" Inputs="installer.wxs" Outputs="$(IntDir)installer.wixobj">
+    <Exec Command="&quot;$(WIX)bin\candle.exe&quot; $(WixCandleFlags) -out &quot;$(IntDir)installer.wixobj&quot; installer.wxs" />
+  </Target>
+  <Target Name="WixLink" DependsOnTargets="WixCompile" Inputs="$(IntDir)installer.wixobj;$(OutDir)wintun.dll" Outputs="$(WixOutputPath)$(WixOutputName)$(WixOutputExt)">
+    <Exec Command="&quot;$(WIX)bin\light.exe&quot; $(WixLightFlags) -out &quot;$(WixOutputPath)$(WixOutputName)$(WixOutputExt)&quot; &quot;$(IntDir)installer.wixobj&quot;" IgnoreExitCode="true" />
+  </Target>
+  <Target Name="WixTestSign" Condition="$(SignMode)=='TestSign'" DependsOnTargets="WixLink" Inputs="$(WixOutputPath)$(WixOutputName)$(WixOutputExt)" Outputs="$(IntDir)$(WixOutputName).sign">
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /sha1 &quot;$(TestCertificate)&quot; /fd sha256 &quot;$(WixOutputPath)$(WixOutputName)$(WixOutputExt)&quot;" />
+    <Touch Files="$(IntDir)$(WixOutputName).sign" AlwaysCreate="true" />
+  </Target>
+  <Target Name="WixProductionSign" Condition="$(SignMode)=='ProductionSign'" DependsOnTargets="WixLink" Inputs="$(WixOutputPath)$(WixOutputName)$(WixOutputExt)" Outputs="$(IntDir)$(WixOutputName).sign">
+    <Exec Command="&quot;$(SignToolPath)&quot; sign /sha1 &quot;$(ProductionCertificate)&quot; /fd sha256 /tr &quot;$(TimeStampServer)&quot; /td sha256 &quot;$(WixOutputPath)$(WixOutputName)$(WixOutputExt)&quot;" />
+    <Touch Files="$(IntDir)$(WixOutputName).sign" AlwaysCreate="true" />
+  </Target>
+  <Target Name="Build" DependsOnTargets="WixCompile;WixLink;WixTestSign;WixProductionSign" />
+  <Target Name="Clean">
+    <Delete Files="$(IntDir)installer.wixobj;$(WixOutputPath)$(WixOutputName)$(WixOutputExt);$(IntDir)$(WixOutputName).sign" />
+  </Target>
+</Project>

@@ -71,14 +71,14 @@
   -->
   <Target Name="MSM-x86"
     Outputs="$(DistributionDir)wintun-x86-$(WintunVersionStr).msm">
-    <MSBuild Projects="installer\installer.vcxproj" Targets="MSM" Properties="Configuration=Release;Platform=Win32" />
+    <MSBuild Projects="installer\installer.proj" Targets="MSM" Properties="Configuration=Release;Platform=Win32" />
   </Target>
   <Target Name="MSM-amd64"
     Outputs="$(DistributionDir)wintun-amd64-$(WintunVersionStr).msm">
-    <MSBuild Projects="installer\installer.vcxproj" Targets="MSM" Properties="Configuration=Release;Platform=x64" />
+    <MSBuild Projects="installer\installer.proj" Targets="MSM" Properties="Configuration=Release;Platform=x64" />
   </Target>
   <Target Name="MSM-arm64"
     Outputs="$(DistributionDir)wintun-arm64-$(WintunVersionStr).msm">
-    <MSBuild Projects="installer\installer.vcxproj" Targets="MSM" Properties="Configuration=Release;Platform=ARM64" />
+    <MSBuild Projects="installer\installer.proj" Targets="MSM" Properties="Configuration=Release;Platform=ARM64" />
   </Target>
 </Project>
